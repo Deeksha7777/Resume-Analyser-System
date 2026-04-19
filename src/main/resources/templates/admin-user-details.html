@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Details | Admin</title>
+    <style>
+        :root {
+            --bg: #eef2f7;
+            --panel: #ffffff;
+            --ink: #1f2937;
+            --muted: #6b7280;
+            --line: #dbe3ee;
+            --primary: #166534;
+            --primary-dark: #14532d;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            color: var(--ink);
+            padding: 20px;
+        }
+
+        .container {
+            width: min(1100px, 100%);
+            margin: 0 auto;
+        }
+
+        .top {
+            background: linear-gradient(120deg, var(--primary), var(--primary-dark));
+            color: #f8fbff;
+            border-radius: 16px;
+            padding: 18px;
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .top h1 {
+            margin: 0;
+            font-size: 1.7rem;
+        }
+
+        .top p {
+            margin: 8px 0 0;
+            color: #e5efff;
+            font-size: 0.95rem;
+        }
+
+        .btn {
+            border: 0;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.22);
+            color: #fff;
+        }
+
+        .layout {
+            margin-top: 12px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 14px;
+        }
+
+        .panel.full {
+            grid-column: 1 / -1;
+        }
+
+        .panel h2 {
+            margin: 0;
+            font-size: 1.2rem;
+        }
+
+        .sub {
+            margin: 8px 0 0;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .kv {
+            margin-top: 10px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 10px;
+            background: #fafcff;
+            font-size: 0.92rem;
+        }
+
+        .kv p {
+            margin: 0 0 6px;
+        }
+
+        .kv p:last-child {
+            margin-bottom: 0;
+        }
+
+        .resume-item,
+        .analysis-item {
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 10px;
+            margin-top: 10px;
+            background: #fff;
+        }
+
+        .resume-item h3,
+        .analysis-item h3 {
+            margin: 0;
+            font-size: 1rem;
+            color: var(--primary-dark);
+        }
+
+        .meta {
+            margin-top: 8px;
+            color: #4d6172;
+            font-size: 0.9rem;
+        }
+
+        .chips {
+            margin-top: 8px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .chip {
+            border-radius: 999px;
+            padding: 5px 9px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            background: #e8fbf4;
+            color: #14532d;
+        }
+
+        pre {
+            margin: 8px 0 0;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 10px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 220px;
+            overflow: auto;
+            font-size: 0.85rem;
+        }
+
+        .pager {
+            margin-top: 12px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .pager a {
+            text-decoration: none;
+            border-radius: 999px;
+            padding: 7px 12px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .empty {
+            margin-top: 10px;
+            color: var(--muted);
+            font-size: 0.92rem;
+        }
+
+        @media (max-width: 900px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <section class="top">
+        <div>
+            <h1>User Details</h1>
+            <p th:text="'Viewing records for: ' + ${selectedUser.name} + ' (' + ${selectedUser.email} + ')'">User details</p>
+        </div>
+        <a class="btn" th:href="@{/admin/dashboard}">Back to Dashboard</a>
+    </section>
+
+    <section class="layout">
+        <article class="panel">
+            <h2>Profile</h2>
+            <div class="kv">
+                <p><b>Name:</b> <span th:text="${selectedUser.name}"></span></p>
+                <p><b>Email:</b> <span th:text="${selectedUser.email}"></span></p>
+                <p><b>Password:</b> <span th:text="${selectedUser.password}"></span></p>
+            </div>
+        </article>
+
+        <article class="panel">
+            <h2>Summary</h2>
+            <div class="kv">
+                <p><b>Total Resumes:</b> <span th:text="${resumeCount}">0</span></p>
+                <p><b>Total Analyses:</b> <span th:text="${analysisCount}">0</span></p>
+                <p><b>Current Page:</b> <span th:text="${currentPage + 1}">1</span></p>
+            </div>
+        </article>
+
+        <article class="panel full">
+            <h2>Uploaded Resumes</h2>
+            <p class="sub">File name and content are listed below if available.</p>
+
+            <p class="empty" th:if="${resumes == null || #lists.isEmpty(resumes)}">No resumes uploaded by this user.</p>
+
+            <div th:if="${resumes != null && !#lists.isEmpty(resumes)}">
+                <div class="resume-item" th:each="resume : ${resumes}">
+                    <h3 th:text="${resume.fileName}">resume-file</h3>
+                    <div class="meta" th:text="'Score: ' + ${resume.score}">Score</div>
+                    <details>
+                        <summary>View Resume Content</summary>
+                        <pre th:text="${resume.content}">content</pre>
+                    </details>
+                </div>
+            </div>
+        </article>
+
+        <article class="panel full">
+            <h2>Analysis History</h2>
+            <p class="sub">Each record includes final score, status, skills, recommendations, and job description used.</p>
+
+            <p class="empty" th:if="${analyses == null || #lists.isEmpty(analyses)}">No analyses found for this user.</p>
+
+            <div th:if="${analyses != null && !#lists.isEmpty(analyses)}">
+                <div class="analysis-item" th:each="analysis : ${analyses}">
+                    <h3 th:text="${analysis.fileName}">file</h3>
+                    <div class="meta">
+                        <p><b>Final Score:</b> <span th:text="${analysis.finalScore}"></span>%</p>
+                        <p><b>Status:</b> <span th:text="${analysis.status}"></span></p>
+                        <p><b>Created At:</b> <span th:text="${#temporals.format(analysis.createdAt, 'dd MMM yyyy, hh:mm a')}"></span></p>
+                    </div>
+
+                    <p class="meta"><b>Matched Skills:</b></p>
+                    <div class="chips" th:if="${analysis.matchedSkills != null && !#lists.isEmpty(analysis.matchedSkills)}">
+                        <span class="chip" th:each="skill : ${analysis.matchedSkills}" th:text="${skill}"></span>
+                    </div>
+                    <p class="empty" th:if="${analysis.matchedSkills == null || #lists.isEmpty(analysis.matchedSkills)}">No matched skills.</p>
+
+                    <p class="meta"><b>Missing Skills:</b></p>
+                    <div class="chips" th:if="${analysis.missingSkills != null && !#lists.isEmpty(analysis.missingSkills)}">
+                        <span class="chip" th:each="skill : ${analysis.missingSkills}" th:text="${skill}"></span>
+                    </div>
+                    <p class="empty" th:if="${analysis.missingSkills == null || #lists.isEmpty(analysis.missingSkills)}">No missing skills.</p>
+
+                    <p class="meta"><b>Recommended Jobs:</b></p>
+                    <div class="chips" th:if="${analysis.recommendedJobs != null && !#lists.isEmpty(analysis.recommendedJobs)}">
+                        <span class="chip" th:each="job : ${analysis.recommendedJobs}" th:text="${job}"></span>
+                    </div>
+                    <p class="empty" th:if="${analysis.recommendedJobs == null || #lists.isEmpty(analysis.recommendedJobs)}">No recommendations.</p>
+
+                    <p class="meta"><b>Job Description Used:</b></p>
+                    <pre th:text="${analysis.jobDescription}"></pre>
+                </div>
+            </div>
+
+            <div class="pager">
+                <a th:if="${hasPreviousPage}" th:href="@{|/admin/users/${selectedUser.id}?page=${currentPage - 1}|}">Previous</a>
+                <a th:if="${hasNextPage}" th:href="@{|/admin/users/${selectedUser.id}?page=${currentPage + 1}|}">View More</a>
+            </div>
+        </article>
+    </section>
+</div>
+</body>
+</html>

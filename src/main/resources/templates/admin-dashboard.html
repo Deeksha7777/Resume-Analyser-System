@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Resume Analyzer</title>
+    <style>
+        :root {
+            --bg: #eef2f7;
+            --panel: #ffffff;
+            --ink: #1f2937;
+            --muted: #6b7280;
+            --line: #dbe3ee;
+            --primary: #166534;
+            --primary-dark: #14532d;
+            --danger: #b91c1c;
+            --danger-dark: #991b1b;
+            --warning: #c2410c;
+            --warning-dark: #9a3412;
+            --success-bg: #ecfdf3;
+            --success-text: #166534;
+            --error-bg: #fef2f2;
+            --error-text: #991b1b;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            color: var(--ink);
+            padding: 20px;
+        }
+
+        .container {
+            width: min(1100px, 100%);
+            margin: 0 auto;
+        }
+
+        .top {
+            background: linear-gradient(120deg, var(--primary), var(--primary-dark));
+            color: #f8fbff;
+            border-radius: 16px;
+            padding: 18px;
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .top h1 {
+            margin: 0;
+            font-size: 1.9rem;
+        }
+
+        .top p {
+            margin: 8px 0 0;
+            color: #e5efff;
+            font-size: 0.95rem;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            border: 0;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        .btn.primary {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+
+        .panel {
+            margin-top: 14px;
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 14px;
+        }
+
+        .panel h2 {
+            margin: 0;
+            font-size: 1.4rem;
+        }
+
+        .sub {
+            margin: 8px 0 0;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .alert {
+            margin-top: 12px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+        }
+
+        .alert.success {
+            background: var(--success-bg);
+            color: var(--success-text);
+        }
+
+        .alert.error {
+            background: var(--error-bg);
+            color: var(--error-text);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+        }
+
+        th, td {
+            border-bottom: 1px solid var(--line);
+            padding: 10px 8px;
+            text-align: left;
+            font-size: 0.92rem;
+            vertical-align: top;
+        }
+
+        th {
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            color: #526175;
+            letter-spacing: 0.03em;
+        }
+
+        .action-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .link-btn {
+            border: 0;
+            border-radius: 999px;
+            padding: 7px 12px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .link-btn.view {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .link-btn.delete {
+            background: var(--danger);
+            color: #fff;
+        }
+
+        .link-btn.delete:hover {
+            background: var(--danger-dark);
+        }
+
+        .link-btn.suspend {
+            background: var(--warning);
+            color: #fff;
+        }
+
+        .link-btn.suspend:hover {
+            background: var(--warning-dark);
+        }
+
+        .link-btn.activate {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .link-btn.activate:hover {
+            background: var(--primary-dark);
+        }
+
+        .empty {
+            margin-top: 12px;
+            color: var(--muted);
+            font-size: 0.95rem;
+        }
+
+        @media (max-width: 760px) {
+            table, thead, tbody, tr, th, td {
+                display: block;
+                width: 100%;
+            }
+
+            thead {
+                display: none;
+            }
+
+            tr {
+                border: 1px solid var(--line);
+                border-radius: 12px;
+                margin-bottom: 10px;
+                padding: 8px;
+            }
+
+            td {
+                border: 0;
+                padding: 6px 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <section class="top">
+        <div>
+            <h1>Admin Dashboard</h1>
+            <p th:text="'Signed in as: ' + ${adminEmail}">Signed in as admin</p>
+        </div>
+        <div class="actions">
+            <a class="btn primary" th:href="@{/logout}">Logout</a>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Registered Users</h2>
+        <p class="sub">View user details, analyses history, and delete users with all related records.</p>
+
+        <div class="alert success" th:if="${success}" th:text="${success}"></div>
+        <div class="alert error" th:if="${error}" th:text="${error}"></div>
+
+        <p class="empty" th:if="${users == null || #lists.isEmpty(users)}">No users available.</p>
+
+        <table th:if="${users != null && !#lists.isEmpty(users)}">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Password</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="user : ${users}">
+                <td th:text="${user.name}">Name</td>
+                <td th:text="${user.email}">Email</td>
+                <td th:text="${user.password}">Password</td>
+                <td th:text="${user.statusLabel}">ACTIVE</td>
+                <td>
+                    <div class="action-row">
+                        <a class="link-btn view" th:href="@{|/admin/users/${user.id}|}">View Details</a>
+                        <form th:if="${user.isActive()}" th:action="@{|/admin/users/${user.id}/suspend|}" method="post"
+                              onsubmit="return confirm('Suspend this user account?');">
+                            <button class="link-btn suspend" type="submit">Suspend</button>
+                        </form>
+                        <form th:if="${!user.isActive()}" th:action="@{|/admin/users/${user.id}/activate|}" method="post"
+                              onsubmit="return confirm('Activate this user account?');">
+                            <button class="link-btn activate" type="submit">Activate</button>
+                        </form>
+                        <form th:action="@{|/admin/users/${user.id}/delete|}" method="post"
+                              onsubmit="return confirm('Delete this user and all related data?');">
+                            <button class="link-btn delete" type="submit">Delete</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</div>
+</body>
+</html>
